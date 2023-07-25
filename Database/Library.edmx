@@ -114,6 +114,9 @@ warning 6002: The table/view 'Library.dbo.vBook' does not have a primary key def
         <Function Name="BooksOfAuthor" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="AuthorId" Type="int" Mode="In" />
         </Function>
+        <Function Name="CountOfBooksOfAuthor" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="true" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" ReturnType="int">
+          <Parameter Name="AuthorId" Type="int" Mode="In" />
+        </Function>
         <EntityContainer Name="LibraryModelStoreContainer">
           <EntitySet Name="Authors" EntityType="Self.Authors" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="AuthorsBooks" EntityType="Self.AuthorsBooks" Schema="dbo" store:Type="Tables" />
@@ -196,7 +199,7 @@ warning 6002: The table/view 'Library.dbo.vBook' does not have a primary key def
           </AssociationSet>
           <EntitySet Name="vBooks" EntityType="LibraryModel.vBook" />
           <FunctionImport Name="BooksOfAuthor" ReturnType="Collection(LibraryModel.BooksOfAuthor_Result)">
-            <Parameter Name="AuthorId" Mode="In" Type="Int32" />
+          <Parameter Name="AuthorId" Mode="In" Type="Int32" />
           </FunctionImport>
         </EntityContainer>
         <Association Name="FK_BookDetails_Books1">

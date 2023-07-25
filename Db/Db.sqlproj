@@ -61,6 +61,7 @@
     <Folder Include="Tables" />
     <Folder Include="Views" />
     <Folder Include="StoredProcedures" />
+    <Folder Include="Functions" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Books.sql" />
@@ -70,6 +71,7 @@
     <Build Include="Tables\AuthorsBooks.sql" />
     <Build Include="Views\vBook.sql" />
     <Build Include="StoredProcedures\BooksOfAuthor.sql" />
+    <Build Include="Functions\CountOfBooksOfAuthor.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="Db.refactorlog" />
