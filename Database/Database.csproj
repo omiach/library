@@ -79,6 +79,9 @@
     <Compile Include="Books.cs">
       <DependentUpon>library.tt</DependentUpon>
     </Compile>
+    <Compile Include="BooksOfAuthor_Result.cs">
+      <DependentUpon>library.tt</DependentUpon>
+    </Compile>
     <Compile Include="library.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -97,6 +100,9 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Publisher.cs">
+      <DependentUpon>library.tt</DependentUpon>
+    </Compile>
+    <Compile Include="vBook.cs">
       <DependentUpon>library.tt</DependentUpon>
     </Compile>
   </ItemGroup>
