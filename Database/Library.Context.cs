@@ -12,6 +12,8 @@ namespace Database
     using System;
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
+    using System.Data.Entity.Core.Objects;
+    using System.Linq;
     
     public partial class LibraryEntities : DbContext
     {
@@ -25,6 +27,20 @@ namespace Database
             throw new UnintentionalCodeFirstException();
         }
     
-        public virtual DbSet<Book> Books { get; set; }
+        public virtual DbSet<BookDetails> BookDetails { get; set; }
+        public virtual DbSet<Books> Books { get; set; }
+        public virtual DbSet<Publisher> Publishers { get; set; }
+        public virtual DbSet<Author> Authors { get; set; }
+        public virtual DbSet<AuthorsBook> AuthorsBooks { get; set; }
+        public virtual DbSet<vBook> vBooks { get; set; }
+    
+        public virtual ObjectResult<BooksOfAuthor_Result> BooksOfAuthor(Nullable<int> authorId)
+        {
+            var authorIdParameter = authorId.HasValue ?
+                new ObjectParameter("AuthorId", authorId) :
+                new ObjectParameter("AuthorId", typeof(int));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<BooksOfAuthor_Result>("BooksOfAuthor", authorIdParameter);
+        }
     }
 }

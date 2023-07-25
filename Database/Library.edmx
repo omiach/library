@@ -5,44 +5,362 @@
     <!-- SSDL content -->
     <edmx:StorageModels>
     <Schema Namespace="LibraryModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Authors">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="FirstName" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="LastName" Type="nvarchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="AuthorsBooks">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="AuthorId" Type="int" Nullable="false" />
+          <Property Name="BookId" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="BookDetails">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" />
+          <Property Name="Description" Type="nvarchar" MaxLength="500" Nullable="false" />
+          <Property Name="NumberOfPages" Type="int" Nullable="false" />
+        </EntityType>
         <EntityType Name="Books">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="Name" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="isActive" Type="bit" Nullable="false" />
+          <Property Name="PublisherId" Type="int" Nullable="false" />
         </EntityType>
+        <EntityType Name="Publishers">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="250" Nullable="false" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'Library.dbo.vBook' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="vBook">
+          <Key>
+            <PropertyRef Name="Id" />
+            <PropertyRef Name="Book" />
+            <PropertyRef Name="isActive" />
+            <PropertyRef Name="Description" />
+            <PropertyRef Name="Authors" />
+            <PropertyRef Name="Publisher" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" />
+          <Property Name="Book" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="isActive" Type="bit" Nullable="false" />
+          <Property Name="Description" Type="nvarchar" MaxLength="500" Nullable="false" />
+          <Property Name="Authors" Type="nvarchar" MaxLength="4000" Nullable="false" />
+          <Property Name="Publisher" Type="nvarchar" MaxLength="250" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_AuthorsBooks_Authors">
+          <End Role="Authors" Type="Self.Authors" Multiplicity="1" />
+          <End Role="AuthorsBooks" Type="Self.AuthorsBooks" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Authors">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="AuthorsBooks">
+              <PropertyRef Name="AuthorId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_AuthorsBooks_Books">
+          <End Role="Books" Type="Self.Books" Multiplicity="1" />
+          <End Role="AuthorsBooks" Type="Self.AuthorsBooks" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Books">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="AuthorsBooks">
+              <PropertyRef Name="BookId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_BookDetails_Books">
+          <End Role="Books" Type="Self.Books" Multiplicity="1" />
+          <End Role="BookDetails" Type="Self.BookDetails" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="Books">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="BookDetails">
+              <PropertyRef Name="Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Books_Publishers">
+          <End Role="Publishers" Type="Self.Publishers" Multiplicity="1" />
+          <End Role="Books" Type="Self.Books" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="Publishers">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Books">
+              <PropertyRef Name="Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Function Name="BooksOfAuthor" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="AuthorId" Type="int" Mode="In" />
+        </Function>
         <EntityContainer Name="LibraryModelStoreContainer">
+          <EntitySet Name="Authors" EntityType="Self.Authors" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="AuthorsBooks" EntityType="Self.AuthorsBooks" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="BookDetails" EntityType="Self.BookDetails" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Books" EntityType="Self.Books" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Publishers" EntityType="Self.Publishers" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="vBook" EntityType="Self.vBook" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [vBook].[Id] AS [Id], 
+    [vBook].[Book] AS [Book], 
+    [vBook].[isActive] AS [isActive], 
+    [vBook].[Description] AS [Description], 
+    [vBook].[Authors] AS [Authors], 
+    [vBook].[Publisher] AS [Publisher]
+    FROM [dbo].[vBook] AS [vBook]</DefiningQuery>
+          </EntitySet>
+          <AssociationSet Name="FK_AuthorsBooks_Authors" Association="Self.FK_AuthorsBooks_Authors">
+            <End Role="Authors" EntitySet="Authors" />
+            <End Role="AuthorsBooks" EntitySet="AuthorsBooks" />
+          </AssociationSet>
+          <AssociationSet Name="FK_AuthorsBooks_Books" Association="Self.FK_AuthorsBooks_Books">
+            <End Role="Books" EntitySet="Books" />
+            <End Role="AuthorsBooks" EntitySet="AuthorsBooks" />
+          </AssociationSet>
+          <AssociationSet Name="FK_BookDetails_Books" Association="Self.FK_BookDetails_Books">
+            <End Role="Books" EntitySet="Books" />
+            <End Role="BookDetails" EntitySet="BookDetails" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Books_Publishers" Association="Self.FK_Books_Publishers">
+            <End Role="Publishers" EntitySet="Publishers" />
+            <End Role="Books" EntitySet="Books" />
+          </AssociationSet>
         </EntityContainer>
       </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="LibraryModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
-        <EntityContainer Name="LibraryEntities" annotation:LazyLoadingEnabled="true" >
-          <EntitySet Name="Books" EntityType="LibraryModel.Book" />
-        </EntityContainer>
-        <EntityType Name="Book">
+        <EntityType Name="BookDetails">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Name" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="Description" Type="String" MaxLength="500" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="NumberOfPages" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Book" Relationship="LibraryModel.FK_BookDetails_Books1" FromRole="BookDetails" ToRole="Books" />
         </EntityType>
+        <EntityType Name="Books">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="isActive" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="BookDetail" Relationship="LibraryModel.FK_BookDetails_Books1" FromRole="Books" ToRole="BookDetails" />
+          <Property Name="PublisherId" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Publisher" Relationship="LibraryModel.FK_Books_Publishers" FromRole="Books" ToRole="Publisher" />
+          <NavigationProperty Name="AuthorsBooks" Relationship="LibraryModel.FK_AuthorsBooks_Books" FromRole="Books" ToRole="AuthorsBook" />
+        </EntityType>
+        <EntityContainer Name="LibraryEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="BookDetails" EntityType="Self.BookDetails" />
+          <EntitySet Name="Books" EntityType="Self.Books" />
+          <AssociationSet Name="FK_BookDetails_Books1" Association="LibraryModel.FK_BookDetails_Books1">
+            <End Role="Books" EntitySet="Books" />
+            <End Role="BookDetails" EntitySet="BookDetails" />
+          </AssociationSet>
+          <EntitySet Name="Publishers" EntityType="LibraryModel.Publisher" />
+          <AssociationSet Name="FK_Books_Publishers" Association="LibraryModel.FK_Books_Publishers">
+            <End Role="Publisher" EntitySet="Publishers" />
+            <End Role="Books" EntitySet="Books" />
+          </AssociationSet>
+          <EntitySet Name="Authors" EntityType="LibraryModel.Author" />
+          <EntitySet Name="AuthorsBooks" EntityType="LibraryModel.AuthorsBook" />
+          <AssociationSet Name="FK_AuthorsBooks_Authors" Association="LibraryModel.FK_AuthorsBooks_Authors">
+            <End Role="Author" EntitySet="Authors" />
+            <End Role="AuthorsBook" EntitySet="AuthorsBooks" />
+          </AssociationSet>
+          <AssociationSet Name="FK_AuthorsBooks_Books" Association="LibraryModel.FK_AuthorsBooks_Books">
+            <End Role="Books" EntitySet="Books" />
+            <End Role="AuthorsBook" EntitySet="AuthorsBooks" />
+          </AssociationSet>
+          <EntitySet Name="vBooks" EntityType="LibraryModel.vBook" />
+          <FunctionImport Name="BooksOfAuthor" ReturnType="Collection(LibraryModel.BooksOfAuthor_Result)">
+            <Parameter Name="AuthorId" Mode="In" Type="Int32" />
+          </FunctionImport>
+        </EntityContainer>
+        <Association Name="FK_BookDetails_Books1">
+          <End Type="LibraryModel.Books" Role="Books" Multiplicity="1" />
+          <End Type="LibraryModel.BookDetails" Role="BookDetails" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="Books">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="BookDetails">
+              <PropertyRef Name="Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="Publisher">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Book" Relationship="LibraryModel.FK_Books_Publishers" FromRole="Publisher" ToRole="Books" />
+        </EntityType>
+        <Association Name="FK_Books_Publishers">
+          <End Type="LibraryModel.Publisher" Role="Publisher" Multiplicity="1" />
+          <End Type="LibraryModel.Books" Role="Books" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="Publisher">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Books">
+              <PropertyRef Name="Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="Author">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="FirstName" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="LastName" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="AuthorsBooks" Relationship="LibraryModel.FK_AuthorsBooks_Authors" FromRole="Author" ToRole="AuthorsBook" />
+        </EntityType>
+        <EntityType Name="AuthorsBook">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <NavigationProperty Name="Author" Relationship="LibraryModel.FK_AuthorsBooks_Authors" FromRole="AuthorsBook" ToRole="Author" />
+          <NavigationProperty Name="Book" Relationship="LibraryModel.FK_AuthorsBooks_Books" FromRole="AuthorsBook" ToRole="Books" />
+        </EntityType>
+        <Association Name="FK_AuthorsBooks_Authors">
+          <End Type="LibraryModel.Author" Role="Author" Multiplicity="1" />
+          <End Type="LibraryModel.AuthorsBook" Role="AuthorsBook" Multiplicity="*" />
+        </Association>
+        <Association Name="FK_AuthorsBooks_Books">
+          <End Type="LibraryModel.Books" Role="Books" Multiplicity="1" />
+          <End Type="LibraryModel.AuthorsBook" Role="AuthorsBook" Multiplicity="*" />
+        </Association>
+        <EntityType Name="vBook">
+          <Key>
+            <PropertyRef Name="Id" />
+            <PropertyRef Name="Book" />
+            <PropertyRef Name="isActive" />
+            <PropertyRef Name="Description" />
+            <PropertyRef Name="Authors" />
+            <PropertyRef Name="Publisher" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" />
+          <Property Name="Book" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="isActive" Type="Boolean" Nullable="false" />
+          <Property Name="Description" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="Authors" Type="String" Nullable="false" MaxLength="4000" FixedLength="false" Unicode="true" />
+          <Property Name="Publisher" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <ComplexType Name="BooksOfAuthor_Result">
+          <Property Type="String" Name="Name" Nullable="false" MaxLength="100" />
+          <Property Type="String" Name="Description" Nullable="true" MaxLength="500" />
+        </ComplexType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
-        <EntityContainerMapping StorageEntityContainer="LibraryModelStoreContainer" CdmEntityContainer="LibraryEntities" >
+        <EntityContainerMapping StorageEntityContainer="LibraryModelStoreContainer" CdmEntityContainer="LibraryEntities">
+          <EntitySetMapping Name="BookDetails">
+            <EntityTypeMapping TypeName="LibraryModel.BookDetails">
+              <MappingFragment StoreEntitySet="BookDetails">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="NumberOfPages" ColumnName="NumberOfPages" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="Books">
-            <EntityTypeMapping TypeName="LibraryModel.Book">
+            <EntityTypeMapping TypeName="LibraryModel.Books">
               <MappingFragment StoreEntitySet="Books">
+                <ScalarProperty Name="PublisherId" ColumnName="PublisherId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="isActive" ColumnName="isActive" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Publishers">
+            <EntityTypeMapping TypeName="LibraryModel.Publisher">
+              <MappingFragment StoreEntitySet="Publishers">
                 <ScalarProperty Name="Name" ColumnName="Name" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="Authors">
+            <EntityTypeMapping TypeName="LibraryModel.Author">
+              <MappingFragment StoreEntitySet="Authors">
+                <ScalarProperty Name="LastName" ColumnName="LastName" />
+                <ScalarProperty Name="FirstName" ColumnName="FirstName" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="AuthorsBooks">
+            <EntityTypeMapping TypeName="LibraryModel.AuthorsBook">
+              <MappingFragment StoreEntitySet="AuthorsBooks">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <AssociationSetMapping Name="FK_AuthorsBooks_Authors" TypeName="LibraryModel.FK_AuthorsBooks_Authors" StoreEntitySet="AuthorsBooks">
+            <EndProperty Name="AuthorsBook">
+              <ScalarProperty Name="Id" ColumnName="Id" />
+            </EndProperty>
+            <EndProperty Name="Author">
+              <ScalarProperty Name="Id" ColumnName="AuthorId" />
+            </EndProperty>
+          </AssociationSetMapping>
+          <AssociationSetMapping Name="FK_AuthorsBooks_Books" TypeName="LibraryModel.FK_AuthorsBooks_Books" StoreEntitySet="AuthorsBooks">
+            <EndProperty Name="AuthorsBook">
+              <ScalarProperty Name="Id" ColumnName="Id" />
+            </EndProperty>
+            <EndProperty Name="Books">
+              <ScalarProperty Name="Id" ColumnName="BookId" />
+            </EndProperty>
+          </AssociationSetMapping>
+          <EntitySetMapping Name="vBooks">
+            <EntityTypeMapping TypeName="LibraryModel.vBook">
+              <MappingFragment StoreEntitySet="vBook">
+                <ScalarProperty Name="Publisher" ColumnName="Publisher" />
+                <ScalarProperty Name="Authors" ColumnName="Authors" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="isActive" ColumnName="isActive" />
+                <ScalarProperty Name="Book" ColumnName="Book" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="BooksOfAuthor" FunctionName="LibraryModel.Store.BooksOfAuthor">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="LibraryModel.BooksOfAuthor_Result">
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>
@@ -57,8 +375,8 @@
     <Options>
       <DesignerInfoPropertySet>
         <DesignerProperty Name="ValidateOnBuild" Value="true" />
-        <DesignerProperty Name="EnablePluralization" Value="true" />
-        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="True" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="False" />
         <DesignerProperty Name="UseLegacyProvider" Value="false" />
         <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
       </DesignerInfoPropertySet>

@@ -12,9 +12,12 @@ namespace Database
     using System;
     using System.Collections.Generic;
     
-    public partial class Book
+    public partial class BookDetails
     {
         public int Id { get; set; }
-        public string Name { get; set; }
+        public string Description { get; set; }
+        public int NumberOfPages { get; set; }
+    
+        public virtual Books Book { get; set; }
     }
 }

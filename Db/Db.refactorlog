@@ -7,4 +7,25 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="Name" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="1db626e0-f82f-4dbd-b7de-b17d5d78b89c" ChangeDateTime="07/25/2023 07:58:28">
+    <Property Name="ElementName" Value="[dbo].[BookDetails].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[BookDetails]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="BookId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="fc850c95-f0d1-44b2-87ef-cf3ec5c7a94c" ChangeDateTime="07/25/2023 08:10:18">
+    <Property Name="ElementName" Value="[dbo].[BookDetails].[BookId]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[BookDetails]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Id" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="cb188692-83e8-46b1-b5e6-9d923f5a2ea3" ChangeDateTime="07/25/2023 12:01:06">
+    <Property Name="ElementName" Value="[dbo].[Authors].[Name]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Authors]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="FirstName" />
+  </Operation>
 </Operations>
